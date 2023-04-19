@@ -247,18 +247,11 @@ function load3DObjects(sceneGraph) {
 		console.error( 'An error happened.' );
 	}
 );
-
-    // ************************** //
-    // Create a cube
-    // ************************** //
-    // Cube center is at (0,0,0)
+    // create cube - SOON TO BE A CAT! 
     const cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
     const cubeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(255,0,0)' });
     const cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
     sceneGraph.add(cubeObject);
-
-//     // Set position of the cube
-//     // The base of the cube will be on the plane 
     cubeObject.position.set(0, 0, 0);
     cubeObject.translateX(20);
     cubeObject.translateY(1);
@@ -275,12 +268,55 @@ function load3DObjects(sceneGraph) {
     cubeBB.setFromObject(cubeObject);
     console.log("cube bounding box", cubeBB);
 
-    // function CheckCollisions_() {
+    // create the remaining cubes - SOON TO BE CATS!
+    function createCube (x, y, z) {
+        const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+        const cubeMaterial = new THREE.MeshPhongMaterial({ color: 'blue' });
+        const cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        sceneGraph.add(cubeObject);
+        cubeObject.position.set(x, y, z);
+        cubeObject.castShadow = true;
+        cubeObject.receiveShadow = true;
+        cubeObject.name = "cube";
+    }
 
-    //     if (cubeBB.intersectsBox(wall)) {
-    //         console.log("collision");
-    //     }
-    // }
+    createCube(15, 1, -15)
+    createCube(-15, 1, 5)
+    createCube(5, 1, 5)
+    createCube(-25, 1, 25)
+
+//     // create the torus - SOON TO BE A POWERUPS!
+//     function createTorus(x, y, z) {
+//         const torusGeometry = new THREE.TorusGeometry(0.6, 0.2, 16, 100);
+//         const torusMaterial = new THREE.MeshPhongMaterial({ color: 'yellow' });
+//         const torusObject = new THREE.Mesh(torusGeometry, torusMaterial);
+//         sceneGraph.add(torusObject);
+//         torusObject.position.set(x, y, z);
+//         torusObject.castShadow = true;
+//         torusObject.receiveShadow = true;
+//         torusObject.name = "torus";
+//         return torusObject;
+//     }
+
+//     var torus1 = createTorus(-15, 3, -5)
+//     var torus2 = createTorus(25, 3, 25)
+// }
+
+function createTorus(x, y, z, name) {
+    const torusGeometry = new THREE.TorusGeometry(0.6, 0.2, 16, 100);
+    const torusMaterial = new THREE.MeshPhongMaterial({ color: 'yellow' });
+    const torusObject = new THREE.Mesh(torusGeometry, torusMaterial);
+    sceneGraph.add(torusObject);
+    torusObject.position.set(x, y, z);
+    torusObject.castShadow = true;
+    torusObject.receiveShadow = true;
+    torusObject.name = name;
+    return torusObject;
+  }
+
+var torus1 = createTorus(-15, 3, -5, "torus1");
+var torus2 = createTorus(25, 3, 25, "torus2");
+
 }
 
 // Displacement value
@@ -304,6 +340,18 @@ function computeFrame(time) {
     //     delta *= -1;
     // }
     // light.translateX(delta);
+
+    const torus1Object = sceneElements.sceneGraph.getObjectByName("torus1");
+    const torus2Object = sceneElements.sceneGraph.getObjectByName("torus2");
+
+    // make them both rotate on their axis
+    torus1Object.rotateY(0.03);
+    torus2Object.rotateY(0.03);
+    torus1Object.rotateX(0.03);
+    torus2Object.rotateX(0.03);
+
+    
+
 
     // CONTROLING THE CUBE WITH THE KEYBOARD
 

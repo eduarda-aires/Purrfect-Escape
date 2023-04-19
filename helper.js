@@ -23,33 +23,24 @@ const helper = {
         const height = window.innerHeight;
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
         sceneElements.camera = camera;
-        camera.position.set(10, 0, 0);
+        //camera.position.set(10, 0, 0); -- camera setting to play the game
+        camera.position.set(30, 70, 30); // -- camera setting to see the scene from above
         camera.lookAt(0, 0, 0);
         camera.name = "camera";
         sceneElements.sceneGraph.add(camera);
 
-        // ************************** //
-        // NEW --- Control for the camera
-        // ************************** //
+        
+        //Camera control
         sceneElements.control = new THREE.OrbitControls(camera);
         sceneElements.control.screenSpacePanning = true;
 
-        // ************************** //
         // Illumination
-        // ************************** //
-
-        // ************************** //
-        // Add ambient light
-        // ************************** //
         const ambientLight = new THREE.AmbientLight('rgb(255, 255, 255)', 0.2);
         sceneElements.sceneGraph.add(ambientLight);
 
         var hemisphericLight = new THREE.HemisphereLight('yellow', 'crimson', 0.2);
         sceneElements.sceneGraph.add(hemisphericLight);
 
-        // ***************************** //
-        // Add spotlight (with shadows)
-        // ***************************** //
         const spotLight = new THREE.SpotLight('rgb(255, 255, 255)', 0.8);
         spotLight.position.set(0, 30, 0);
         sceneElements.sceneGraph.add(spotLight);
@@ -59,11 +50,8 @@ const helper = {
         spotLight.shadow.mapSize.width = 2048;
         spotLight.shadow.mapSize.height = 2048;
 
-        // Give a name to the spot light
         spotLight.name = "light";
 
-
-        // *********************************** //
         // Create renderer (with shadow map)
         // *********************************** //
         const renderer = new THREE.WebGLRenderer({ antialias: true });
