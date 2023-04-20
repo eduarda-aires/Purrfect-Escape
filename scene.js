@@ -4,7 +4,7 @@
 const sceneElements = {
     sceneGraph: null,
     camera: null,
-    control: null,  // NEW
+    control: null, 
     renderer: null,
 };
 
@@ -84,9 +84,7 @@ function onDocumentKeyUp(event) {
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
-    // ************************** //
     // Create a ground plane
-    // ************************** //
     const planeGeometry = new THREE.PlaneGeometry(60, 60);
     const planeMaterial = new THREE.MeshPhongMaterial({ color: 'gray', side: THREE.DoubleSide });
     const planeObject = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -310,14 +308,6 @@ function computeFrame(time) {
     // spotlight
     const light = sceneElements.sceneGraph.getObjectByName("light");
 
-    // Apply a small displacement to the light
-    // if (light.position.x >= -5) {
-    //     delta *= -1;
-    // } else if (light.position.x <= -5) {
-    //     delta *= -1;
-    // }
-    // light.translateX(delta);
-
     const torus1Object = sceneElements.sceneGraph.getObjectByName("torus1");
     const torus2Object = sceneElements.sceneGraph.getObjectByName("torus2");
     // make them both rotate on their axis
@@ -361,7 +351,7 @@ function computeFrame(time) {
     // Rendering
     helper.render(sceneElements);
 
-    // NEW --- Update control of the camera
+    //Update control of the camera
     sceneElements.control.update();
 
     // Call for the next frame
