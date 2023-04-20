@@ -1,14 +1,5 @@
 "use strict";
 
-//  Adapted from Daniel Rohmer tutorial
-//
-// 		https://imagecomputing.net/damien.rohmer/teaching/2019_2020/semester_1/MPRI_2-39/practice/threejs/content/000_threejs_tutorial/index.html
-//
-//  And from an example by Pedro Iglésias
-//
-// 		J. Madeira - April 2021
-
-
 // To store the scene graph, and elements useful to rendering the scene
 const sceneElements = {
     sceneGraph: null,
@@ -17,23 +8,17 @@ const sceneElements = {
     renderer: null,
 };
 
-
-// Functions are called
-//  1. Initialize the empty scene
-//  2. Add elements within the scene
-//  3. Animate
 helper.initEmptyScene(sceneElements);
 load3DObjects(sceneElements.sceneGraph);
 requestAnimationFrame(computeFrame);
 
 // HANDLING EVENTS
-
 // Event Listeners
 
 window.addEventListener('resize', resizeWindow);
 
 //To keep track of the keyboard - WASD
-var keyD = false, keyA = false, keyS = false, keyW = false, keySpace = false;
+var keyD = false, keyA = false, keyS = false, keyW = false, keySpace = false, keyT = false;
 document.addEventListener('keydown', onDocumentKeyDown, false);
 document.addEventListener('keyup', onDocumentKeyUp, false);
 
@@ -65,6 +50,10 @@ function onDocumentKeyDown(event) {
         case 32: //space
             keySpace = true;
             break;
+        // letter T
+        case 84:
+            keyT = true;
+            break;
     }
 }
 function onDocumentKeyUp(event) {
@@ -84,10 +73,12 @@ function onDocumentKeyUp(event) {
         case 32: //space
             keySpace = false;
             break;
+        // letter T
+        case 84:
+            keyT = false;
+            break;
     }
 }
-
-//////////////////////////////////////////////////////////////////
 
 
 // Create and insert in the scene graph the models of the 3D scene
@@ -97,7 +88,7 @@ function load3DObjects(sceneGraph) {
     // Create a ground plane
     // ************************** //
     const planeGeometry = new THREE.PlaneGeometry(60, 60);
-    const planeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(200, 200, 200)', side: THREE.DoubleSide });
+    const planeMaterial = new THREE.MeshPhongMaterial({ color: 'gray', side: THREE.DoubleSide });
     const planeObject = new THREE.Mesh(planeGeometry, planeMaterial);
     sceneGraph.add(planeObject);
 
@@ -330,8 +321,8 @@ function computeFrame(time) {
     const torus1Object = sceneElements.sceneGraph.getObjectByName("torus1");
     const torus2Object = sceneElements.sceneGraph.getObjectByName("torus2");
     // make them both rotate on their axis
-    torus1Object.rotateY(0.03);
-    torus2Object.rotateY(0.03);
+    //torus1Object.rotateY(0.03);
+    //torus2Object.rotateY(0.03);
     torus1Object.rotateX(0.03);
     torus2Object.rotateX(0.03);
 
@@ -351,12 +342,16 @@ function computeFrame(time) {
          cube.translateX(dispX);
     }
 
-    // allow a tiny jump
+    // press space to change the camera point of view to first person
     if (keySpace) {
-        cube.translateY(0.5);
-    if (cube.position.y >= 1.5) {
-        cube.translateY(-0.5);
-    }
+        const camera = sceneElements.sceneGraph.getObjectByName("camera");
+        camera.position.set(10, 9, 0); // camera setting to play the game
+        // press space again to change the camera point of view to third person
+        keySpace = false;
+        // press tab to change the camera point of view to third person
+    } else if (keyT) {
+        const camera = sceneElements.sceneGraph.getObjectByName("camera");
+        camera.position.set(30, 50, 15);
     }
 
     // TO DO:
