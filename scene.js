@@ -33,7 +33,7 @@ requestAnimationFrame(computeFrame);
 window.addEventListener('resize', resizeWindow);
 
 //To keep track of the keyboard - WASD
-var keyD = false, keyA = false, keyS = false, keyW = false;
+var keyD = false, keyA = false, keyS = false, keyW = false, keySpace = false;
 document.addEventListener('keydown', onDocumentKeyDown, false);
 document.addEventListener('keyup', onDocumentKeyUp, false);
 
@@ -62,6 +62,9 @@ function onDocumentKeyDown(event) {
         case 87: //w
             keyW = true;
             break;
+        case 32: //space
+            keySpace = true;
+            break;
     }
 }
 function onDocumentKeyUp(event) {
@@ -77,6 +80,9 @@ function onDocumentKeyUp(event) {
             break;
         case 87: //w
             keyW = false;
+            break;
+        case 32: //space
+            keySpace = false;
             break;
     }
 }
@@ -285,76 +291,51 @@ function load3DObjects(sceneGraph) {
     createCube(5, 1, 5)
     createCube(-25, 1, 25)
 
-//     // create the torus - SOON TO BE A POWERUPS!
-//     function createTorus(x, y, z) {
-//         const torusGeometry = new THREE.TorusGeometry(0.6, 0.2, 16, 100);
-//         const torusMaterial = new THREE.MeshPhongMaterial({ color: 'yellow' });
-//         const torusObject = new THREE.Mesh(torusGeometry, torusMaterial);
-//         sceneGraph.add(torusObject);
-//         torusObject.position.set(x, y, z);
-//         torusObject.castShadow = true;
-//         torusObject.receiveShadow = true;
-//         torusObject.name = "torus";
-//         return torusObject;
-//     }
 
-//     var torus1 = createTorus(-15, 3, -5)
-//     var torus2 = createTorus(25, 3, 25)
-// }
+    // create the tori - SOON TO BE POWERUPS!
+    function createTorus(x, y, z, name) {
+        const torusGeometry = new THREE.TorusGeometry(0.6, 0.2, 16, 100);
+        const torusMaterial = new THREE.MeshPhongMaterial({ color: 'yellow' });
+        const torusObject = new THREE.Mesh(torusGeometry, torusMaterial);
+        sceneGraph.add(torusObject);
+        torusObject.position.set(x, y, z);
+        torusObject.castShadow = true;
+        torusObject.receiveShadow = true;
+        torusObject.name = name;
+        return torusObject;
+    }
 
-function createTorus(x, y, z, name) {
-    const torusGeometry = new THREE.TorusGeometry(0.6, 0.2, 16, 100);
-    const torusMaterial = new THREE.MeshPhongMaterial({ color: 'yellow' });
-    const torusObject = new THREE.Mesh(torusGeometry, torusMaterial);
-    sceneGraph.add(torusObject);
-    torusObject.position.set(x, y, z);
-    torusObject.castShadow = true;
-    torusObject.receiveShadow = true;
-    torusObject.name = name;
-    return torusObject;
-  }
-
-var torus1 = createTorus(-15, 3, -5, "torus1");
-var torus2 = createTorus(25, 3, 25, "torus2");
+    var torus1 = createTorus(-15, 3, -5, "torus1");
+    var torus2 = createTorus(25, 3, 25, "torus2");
 
 }
 
 // Displacement value
-
 var delta = 0.1;
-
 var dispX = 0.2, dispZ = 0.2;
 
 function computeFrame(time) {
 
-    // THE SPOT LIGHT
-
-    // Can extract an object from the scene Graph from its name
+    // spotlight
     const light = sceneElements.sceneGraph.getObjectByName("light");
 
-    // Apply a small displacement
-
-    // if (light.position.x >= 10) {
+    // Apply a small displacement to the light
+    // if (light.position.x >= -5) {
     //     delta *= -1;
-    // } else if (light.position.x <= -10) {
+    // } else if (light.position.x <= -5) {
     //     delta *= -1;
     // }
     // light.translateX(delta);
 
     const torus1Object = sceneElements.sceneGraph.getObjectByName("torus1");
     const torus2Object = sceneElements.sceneGraph.getObjectByName("torus2");
-
     // make them both rotate on their axis
     torus1Object.rotateY(0.03);
     torus2Object.rotateY(0.03);
     torus1Object.rotateX(0.03);
     torus2Object.rotateX(0.03);
 
-    
-
-
     // CONTROLING THE CUBE WITH THE KEYBOARD
-
     const cube = sceneElements.sceneGraph.getObjectByName("cube");
 
     if (keyD) {
@@ -370,6 +351,15 @@ function computeFrame(time) {
          cube.translateX(dispX);
     }
 
+    // allow a tiny jump
+    if (keySpace) {
+        cube.translateY(0.5);
+    if (cube.position.y >= 1.5) {
+        cube.translateY(-0.5);
+    }
+    }
+
+    // TO DO:
     // Check collision with the walls
     // CheckCollisions_();
 
