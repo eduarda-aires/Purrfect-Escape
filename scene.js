@@ -1,3 +1,8 @@
+// model importer
+import * as THREE from 'three'; 
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 let sceneElements = {
     sceneGraph: null,
     camera: null,
@@ -5,75 +10,76 @@ let sceneElements = {
     renderer: null,
 };
 
-let helper = {
+function initEmptyScene (sceneElements) {
 
-    initEmptyScene: function (sceneElements) {
+    // Create the 3D scene
+    sceneElements.sceneGraph = new THREE.Scene();
 
-        // Create the 3D scene
-        sceneElements.sceneGraph = new THREE.Scene();
+    //helper axis helper 
+    let axesHelper = new THREE.AxesHelper( 50 );
+    sceneElements.sceneGraph.add( axesHelper );
 
-        // Add camera
-        let width = window.innerWidth;
-        let height = window.innerHeight;
-        let camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
-        sceneElements.camera = camera;
-        //camera.position.set(10, 0, 0); -- camera setting to play the game
-        camera.position.set(30, 50, 15); // -- camera setting to see the scene from above
-        camera.lookAt(0, 0, 0);
-        camera.name = "camera";
-        sceneElements.sceneGraph.add(camera);
+    // Add camera
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
+    sceneElements.camera = camera;
+    camera.position.set(0, 50, 50); //-- camera setting to play the game
+    //camera.position.set(30, 50, 15); // -- camera setting to see the scene from above
+    //camera.lookAt(0, 0, 0);
+    camera.name = "camera";
+    sceneElements.sceneGraph.add(camera);
 
-        
-        //Camera control
-        sceneElements.control = new THREE.OrbitControls(camera);
-        sceneElements.control.screenSpacePanning = true;
+    // Illumination
+    let ambientLight = new THREE.AmbientLight('rgb(255, 255, 255)', 0.2);
+    sceneElements.sceneGraph.add(ambientLight);
 
-        // Illumination
-        let ambientLight = new THREE.AmbientLight('rgb(255, 255, 255)', 0.2);
-        sceneElements.sceneGraph.add(ambientLight);
+    var hemisphericLight = new THREE.HemisphereLight('yellow', 'crimson', 0.1);
+    sceneElements.sceneGraph.add(hemisphericLight);
 
-        var hemisphericLight = new THREE.HemisphereLight('yellow', 'crimson', 0.1);
-        sceneElements.sceneGraph.add(hemisphericLight);
+    let spotLight = new THREE.SpotLight('rgb(255, 255, 255)', 0.8);
+    spotLight.position.set(0, 30, 0);
+    sceneElements.sceneGraph.add(spotLight);
 
-        let spotLight = new THREE.SpotLight('rgb(255, 255, 255)', 0.8);
-        spotLight.position.set(0, 30, 0);
-        sceneElements.sceneGraph.add(spotLight);
+    // Setup shadow properties for the spotlight
+    spotLight.castShadow = true;
+    spotLight.shadow.mapSize.width = 2048;
+    spotLight.shadow.mapSize.height = 2048;
 
-        // Setup shadow properties for the spotlight
-        spotLight.castShadow = true;
-        spotLight.shadow.mapSize.width = 2048;
-        spotLight.shadow.mapSize.height = 2048;
+    spotLight.name = "light";
 
-        spotLight.name = "light";
+    // Create renderer (with shadow map)
+    let renderer = new THREE.WebGLRenderer({ antialias: true });
+    sceneElements.renderer = renderer;
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setClearColor('rgb(135, 206, 235)', 1.0);
+    renderer.setSize(width, height);
 
-        // Create renderer (with shadow map)
-        let renderer = new THREE.WebGLRenderer({ antialias: true });
-        sceneElements.renderer = renderer;
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setClearColor('rgb(135, 206, 235)', 1.0);
-        renderer.setSize(width, height);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-        // Setup shadowMap property
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    //Camera control
+    
+    //sceneElements.control = new THREE.OrbitControls(camera);
+    const control = new OrbitControls( camera, renderer.domElement );
+    control.screenSpacePanning = true;
 
-
-        // Add the rendered image in the HTML DOM
-        let htmlElement = document.querySelector("#Tag3DScene");
-        htmlElement.appendChild(renderer.domElement);
-    },
-
-    render: function render(sceneElements) {
-        sceneElements.renderer.render(sceneElements.sceneGraph, sceneElements.camera);
-    },
+    // Add the rendered image in the HTML DOM
+    let htmlElement = document.querySelector("#Tag3DScene");
+    htmlElement.appendChild(renderer.domElement);
 };
 
-helper.initEmptyScene(sceneElements);
+function render(sceneElements) {
+    sceneElements.renderer.render(sceneElements.sceneGraph, sceneElements.camera);
+};
+
+initEmptyScene(sceneElements);
 load3DObjects(sceneElements.sceneGraph);
+window.addEventListener('resize', resizeWindow);
 requestAnimationFrame(computeFrame);
 
 // Event Listeners
-window.addEventListener('resize', resizeWindow);
+
 
 let keyD = false, keyA = false, keyS = false, keyW = false, keySpace = false, keyT = false;
 document.addEventListener('keydown', onDocumentKeyDown, false);
@@ -138,13 +144,97 @@ function onDocumentKeyUp(event) {
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
+    const loader = new GLTFLoader();
+
+    // load the player's cat
+
+    loader.load( './models/tuxedoCat/scene.gltf', function ( gltf ) {
+
+        let cat = gltf.scene.children[0];
+        cat.scale.set(0.2, 0.2, 0.2);
+        cat.translateX(20);
+        cat.translateY(5);
+        cat.translateZ(0);
+        cat.rotateZ(Math.PI / -2);
+        cat.name = "cat";
+        cat.castShadow = true;
+        cat.receiveShadow = true;
+        sceneGraph.add( cat );
+        
+        //let camera = sceneElements.sceneGraph.getObjectByName("camera");
+        //cat.add(camera);
+
+
+        //camera look at cat
+        //camera.lookAt(cat.position); // descomentar depois
+
+
+        
+        //camera.position.set(10, 30, 0);
+        /* const cameraOffset = new THREE.Vector3(30, 10, 10); // Adjust as needed
+        const cameraRotation = new THREE.Euler(Math.PI / 6, Math.PI, 0); // Adjust as needed
+        camera.position.copy(cameraOffset);
+        camera.rotation.copy(cameraRotation); */
+        
+
+    }, undefined, function ( error ) {
+    
+        console.error( error );
+    
+    } );
+
+    // load powerups
+
+    function createPowa(x, y, z, name) {
+
+        const powaloader = new GLTFLoader();
+
+        loader.load( './models/powerUp/scene.gltf', function ( gltf ) {
+
+            let powa = gltf.scene.children[0];
+            powa.scale.set(0.003, 0.003, 0.003);
+            powa.name = "powa";
+            powa.castShadow = true;
+            powa.receiveShadow = true;
+            sceneGraph.add( powa );
+            powa.position.set(x, y, z);
+            powa.name = name;
+            return powa;
+        }, undefined, function ( error ) {
+        
+            console.error( error );
+        
+        }
+        );
+    }
+
+        let powa1 = createPowa(-15, 1, -5, "powa1");
+        let powa2 = createPowa(25, 1, 25, "powa2");
+    
+    const groundtexture = new THREE.TextureLoader().load('./textures/ground.png' );
+    //REAPEAT TEXTURE
+    groundtexture.wrapS = THREE.RepeatWrapping;
+    groundtexture.wrapT = THREE.RepeatWrapping;
+    groundtexture.repeat.set( 4, 4 );
+    const groundmaterial = new THREE.MeshPhongMaterial( { map:groundtexture , side: THREE.DoubleSide} );
+
     let planeGeometry = new THREE.PlaneGeometry(60, 60);
     let planeMaterial = new THREE.MeshPhongMaterial({ color: 'gray', side: THREE.DoubleSide });
-    let planeObject = new THREE.Mesh(planeGeometry, planeMaterial);
+    let planeObject = new THREE.Mesh(planeGeometry, groundmaterial);
     sceneGraph.add(planeObject);
 
     planeObject.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
     planeObject.receiveShadow = true;
+
+    const grasstexture = new THREE.TextureLoader().load('./textures/grass.png' );
+    //REAPEAT TEXTURE
+    grasstexture.wrapS = THREE.RepeatWrapping;
+    grasstexture.wrapT = THREE.RepeatWrapping;
+    grasstexture.repeat.set( 0.06, 0.06 );
+    const grassmaterial = new THREE.MeshPhongMaterial( { map:grasstexture , side: THREE.DoubleSide} );
+    grassmaterial.polygonOffset = true;
+    grassmaterial.polygonOffsetFactor = -0.1;
+    grassmaterial.polygonOffsetUnits = -1;
 
     // WALLS
     let length = 10, width = 5;
@@ -155,13 +245,6 @@ function load3DObjects(sceneGraph) {
     wall.lineTo( length, width );
     wall.lineTo( length, 0 );
     wall.lineTo( 0, 0 );
-
-    let longwall = new THREE.Shape();
-    longwall.moveTo( 0,0 );
-    longwall.lineTo( 0, width );
-    longwall.lineTo( length*2, width );
-    longwall.lineTo( length*2, 0 );
-    longwall.lineTo( 0, 0 );
 
     let extrudeSettings = {
         steps: 1,
@@ -174,10 +257,10 @@ function load3DObjects(sceneGraph) {
     };
 
     let wall_geometry = new THREE.ExtrudeGeometry( wall, extrudeSettings );
-    let wall_material = new THREE.MeshPhongMaterial( { color: 0x55ff55, map: texture } );
+    let wall_material = new THREE.MeshBasicMaterial( { color: 0x55ff55} );
 
     function createWall(x, y, z, rotation){
-        let wall = new THREE.Mesh( wall_geometry, wall_material ) ;
+        let wall = new THREE.Mesh( wall_geometry, grassmaterial ) ;
         sceneGraph.add( wall );
         wall.castShadow = true;
         wall.receiveShadow = true;
@@ -185,11 +268,8 @@ function load3DObjects(sceneGraph) {
         wall.translateX(x).translateY(y).translateZ(z);
         wall.rotateY(rotation);
 
-        // wall bounding box
-        let wallBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
-        wallBox.setFromObject(wall);
-        wall.userData.box = wallBox;
-        console.log(wallBox);
+        //wall.material.castShadow = true;
+        //wall.material.receiveShadow = true;
     }
 
     // MAZE WALLS 
@@ -254,43 +334,8 @@ function load3DObjects(sceneGraph) {
     createWall(-30, 0, 30, Math.PI/2);
     createWall(-30, 0, -10, Math.PI/2);
     createWall(-30, 0, -20, Math.PI/2);
-
-    // instantiate a loader
-    let loader = new THREE.TextureLoader();
-
-    // Test texture stuff : 
-    var canvas = document.createElement( 'CANVAS' );
-    canvas.width = 32;
-    canvas.height = 32;
-
-    var texture = new THREE.CanvasTexture( canvas );
-		texture.repeat.set( 2, 2 );
-		texture.wrapS = THREE.RepeatWrapping;
-		texture.wrapT = THREE.RepeatWrapping;
-
-    // load a resource
-    loader.load(
-	
-        // resource URL
-	'https://imgur.com/a/n99yszb',
-
-	// onLoad callback
-	function ( texture ) {
-		// in this example we create the material when the texture is loaded
-		let material = new THREE.MeshBasicMaterial( {
-			map: texture
-		} );
-	},
-
-	// onProgress callback currently not supported
-	undefined,
-
-	// onError callback
-	function ( err ) {
-		console.error( 'An error happened.' );
-	}
-);
-    // create cube - SOON TO BE A CAT! 
+;
+    /* // create cube - SOON TO BE A CAT! 
     let cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
     let cubeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(255,0,0)' });
     let cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
@@ -303,13 +348,13 @@ function load3DObjects(sceneGraph) {
     cubeObject.receiveShadow = true;
     cubeObject.name = "cube";
 
-    let camera = sceneElements.sceneGraph.getObjectByName("camera");
-    cubeObject.add(camera);
+    //let camera = sceneElements.sceneGraph.getObjectByName("camera");
+    //cubeObject.add(camera);
 
     // cube bounding box
     let cubeBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
     cubeBB.setFromObject(cubeObject);
-    console.log("cube bounding box", cubeBB);
+    console.log("cube bounding box", cubeBB); */
 
     // create the remaining cubes - SOON TO BE CATS!
     function createCube (x, y, z) {
@@ -328,8 +373,11 @@ function load3DObjects(sceneGraph) {
     createCube(5, 1, 5)
     createCube(-25, 1, 25)
 
+    // create the powerups 
 
-    // create the tori - SOON TO BE POWERUPS!
+
+    
+    /* // create the tori - SOON TO BE POWERUPS!
     function createTorus(x, y, z, name) {
         let torusGeometry = new THREE.TorusGeometry(0.6, 0.2, 16, 100);
         let torusMaterial = new THREE.MeshPhongMaterial({ color: 'yellow' });
@@ -344,21 +392,54 @@ function load3DObjects(sceneGraph) {
 
     var torus1 = createTorus(-15, 3, -5, "torus1");
     var torus2 = createTorus(25, 3, 25, "torus2");
-
+ */
 }
 
 // Displacement value
 var delta = 0.1;
-var dispX = 0.2, dispZ = 0.2;
+var dispX = 0.2, dispZ = 0.2, dispY = 0.2;
 
 function computeFrame(time) {
 
-    let torus1Object = sceneElements.sceneGraph.getObjectByName("torus1");
+    /* let torus1Object = sceneElements.sceneGraph.getObjectByName("torus1");
     let torus2Object = sceneElements.sceneGraph.getObjectByName("torus2");
     torus1Object.rotateX(0.03);
-    torus2Object.rotateX(0.03);
+    torus2Object.rotateX(0.03); */
 
-    // CONTROLING THE CUBE WITH THE KEYBOARD
+    // rotate power ups after they load
+    let powa1 = sceneElements.sceneGraph.getObjectByName("powa1");
+    let powa2 = sceneElements.sceneGraph.getObjectByName("powa2");
+    if(powa1) powa1.rotation.z -= 0.05
+    if(powa2) powa2.rotation.z -= 0.05
+
+    const moveSpeed = 0.15;
+    const xAxis = new THREE.Vector3(1, 0, 0); // Move along the x-axis
+    const yAxis = new THREE.Vector3(0, 1, 0); // Move along the z-axis
+
+    let cat = sceneElements.sceneGraph.getObjectByName("cat");
+
+    if (keyD) {
+    cat.translateOnAxis(xAxis, -moveSpeed);
+    //rotate cat to face the right direction
+    //cat.rotation.z = Math.PI/2;
+    }
+    if (keyW) {
+    cat.translateOnAxis(yAxis, -moveSpeed);
+    //rotate cat to face the right direction
+    //cat.rotation.z = Math.PI;
+    }
+    if (keyA) {
+    cat.translateOnAxis(xAxis, moveSpeed);
+    //rotate cat to face the right direction
+    //cat.rotation.z = -Math.PI/2;
+    }
+    if (keyS) {
+    cat.translateOnAxis(yAxis, moveSpeed);
+    //rotate cat to face the right direction
+    //cat.rotation.z = 0;
+    }
+
+    /* // CONTROLING THE CUBE WITH THE KEYBOARD
     let cube = sceneElements.sceneGraph.getObjectByName("cube");
     if (keyD) {
         cube.translateZ(-dispZ);
@@ -371,7 +452,7 @@ function computeFrame(time) {
     }
     if (keyS) {
          cube.translateX(dispX);
-    }
+    } */
 
     // press space to change the camera point of view to first person
     if (keySpace) {
@@ -390,10 +471,7 @@ function computeFrame(time) {
     // CheckCollisions_();
 
     // Rendering
-    helper.render(sceneElements);
-
-    //Update control of the camera
-    sceneElements.control.update();
+    render(sceneElements);
 
     // Call for the next frame
     requestAnimationFrame(computeFrame);
