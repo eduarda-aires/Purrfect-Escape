@@ -144,12 +144,26 @@ function onDocumentKeyUp(event) {
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
+    // create background
+    let bgloader = new THREE.TextureLoader();
+    let bgTexture = bgloader.load('./textures/bluegrad.png');
+    sceneGraph.background = bgTexture;
+
+
     const loader = new GLTFLoader();
 
     // load the player's cat
 
     loader.load( './models/tuxedoCat/scene.gltf', function ( gltf ) {
+        gltf.scene.traverse( function ( child ) {
 
+            if ( child.isMesh ) {
+                // Set shadow property
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+
+        } );
         let cat = gltf.scene.children[0];
         cat.scale.set(0.2, 0.2, 0.2);
         cat.translateX(20);
@@ -157,8 +171,7 @@ function load3DObjects(sceneGraph) {
         cat.translateZ(0);
         cat.rotateZ(Math.PI / -2);
         cat.name = "cat";
-        cat.castShadow = true;
-        cat.receiveShadow = true;
+        
         sceneGraph.add( cat );
         
         //let camera = sceneElements.sceneGraph.getObjectByName("camera");
@@ -190,7 +203,15 @@ function load3DObjects(sceneGraph) {
         const powaloader = new GLTFLoader();
 
         loader.load( './models/powerUp/scene.gltf', function ( gltf ) {
+            gltf.scene.traverse( function ( child ) {
 
+                if ( child.isMesh ) {
+                    // Set shadow property
+                    child.castShadow = true;
+                    //child.receiveShadow = true;
+                }
+
+            } );
             let powa = gltf.scene.children[0];
             powa.scale.set(0.003, 0.003, 0.003);
             powa.name = "powa";
@@ -263,7 +284,7 @@ function load3DObjects(sceneGraph) {
         let wall = new THREE.Mesh( wall_geometry, grassmaterial ) ;
         sceneGraph.add( wall );
         wall.castShadow = true;
-        wall.receiveShadow = true;
+        //wall.receiveShadow = true;
 
         wall.translateX(x).translateY(y).translateZ(z);
         wall.rotateY(rotation);
@@ -334,27 +355,99 @@ function load3DObjects(sceneGraph) {
     createWall(-30, 0, 30, Math.PI/2);
     createWall(-30, 0, -10, Math.PI/2);
     createWall(-30, 0, -20, Math.PI/2);
-;
-    /* // create cube - SOON TO BE A CAT! 
-    let cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
-    let cubeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(255,0,0)' });
-    let cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    sceneGraph.add(cubeObject);
-    cubeObject.position.set(0, 0, 0);
-    cubeObject.translateX(20);
-    cubeObject.translateY(1);
-    cubeObject.translateZ(-4);
-    cubeObject.castShadow = true;
-    cubeObject.receiveShadow = true;
-    cubeObject.name = "cube";
 
     //let camera = sceneElements.sceneGraph.getObjectByName("camera");
     //cubeObject.add(camera);
 
     // cube bounding box
-    let cubeBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+    /*let cubeBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
     cubeBB.setFromObject(cubeObject);
     console.log("cube bounding box", cubeBB); */
+
+    // Let's create the remaining kittens!
+    // Gray Cat
+    loader.load( './models/orangeCat/scene.gltf', function ( gltf ) {
+        gltf.scene.traverse( function ( child ) {
+
+            if ( child.isMesh ) {
+                // Set shadow property
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+
+        } );
+        let oraCat = gltf.scene.children[0];
+        oraCat.scale.set(0.7, 0.7, 0.7);
+        oraCat.position.set(15, 0.5, -15);
+        oraCat.rotateZ(Math.PI/2);
+        oraCat.name = "oraCat";
+        sceneGraph.add( oraCat );
+    }, undefined, function ( error ) {        
+        console.error( error );
+    } );
+
+    // Orange Cat
+    loader.load( './models/grayCat/scene.gltf', function ( gltf ) {
+        gltf.scene.traverse( function ( child ) {
+
+            if ( child.isMesh ) {
+                // Set shadow property
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+
+        } );
+        let grayCat = gltf.scene.children[0];
+        grayCat.scale.set(0.9, 0.9, 0.9);
+        grayCat.position.set(-25, 0, 25);
+        grayCat.rotateZ(Math.PI/2);
+        grayCat.name = "grayCat";
+        sceneGraph.add( grayCat );
+    }, undefined, function ( error ) {        
+        console.error( error );
+    } );
+
+    // Brown Cat
+    loader.load( './models/brownCat/scene.gltf', function ( gltf ) {
+        gltf.scene.traverse( function ( child ) {
+
+            if ( child.isMesh ) {
+                // Set shadow property
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+
+        } );
+        let broCat = gltf.scene.children[0];
+        broCat.scale.set(1.6, 1.6, 1.6);
+        broCat.position.set(-15, -0.5, 5);
+        broCat.rotateZ(4.7);
+        broCat.name = "broCat";
+        sceneGraph.add( broCat );
+    }, undefined, function ( error ) {        
+        console.error( error );
+    } );
+
+    // White Cat
+    loader.load( './models/whiteCat/scene.gltf', function ( gltf ) {
+        gltf.scene.traverse( function ( child ) {
+
+            if ( child.isMesh ) {
+                // Set shadow property
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+
+        } );
+        let whiteCat = gltf.scene.children[0];
+        whiteCat.scale.set(1, 1, 1);
+        whiteCat.position.set(5, 0.5, 5);
+        whiteCat.rotateZ(0);
+        whiteCat.name = "whiteCat";
+        sceneGraph.add( whiteCat );
+    }, undefined, function ( error ) {        
+        console.error( error );
+    } );
 
     // create the remaining cubes - SOON TO BE CATS!
     function createCube (x, y, z) {
@@ -367,11 +460,8 @@ function load3DObjects(sceneGraph) {
         cubeObject.receiveShadow = true;
         cubeObject.name = "cube";
     }
-
-    createCube(15, 1, -15)
     createCube(-15, 1, 5)
     createCube(5, 1, 5)
-    createCube(-25, 1, 25)
 
     // create the powerups 
 
