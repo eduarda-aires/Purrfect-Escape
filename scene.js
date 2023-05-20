@@ -3,17 +3,32 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+// Show the loading screen
+document.getElementById("loading-screen").style.visibility = "visible";
+
+setTimeout(function() {
+    // Hide the loading screen
+    document.getElementById("loading-screen").style.visibility = "hidden";
+
+    // Start your game logic or render loop here
+    startGame();
+}, 1000);
+
+
 let sceneElements = {
     sceneGraph: null,
     camera: null,
     control: null, 
     renderer: null,
 };
+let walls = [];
 
 function initEmptyScene (sceneElements) {
 
     // Create the 3D scene
     sceneElements.sceneGraph = new THREE.Scene();
+
+    //ceneElements.sceneGraph.rotation.x = Math.PI;
 
     //helper axis helper 
     let axesHelper = new THREE.AxesHelper( 50 );
@@ -22,13 +37,16 @@ function initEmptyScene (sceneElements) {
     // Add camera
     let width = window.innerWidth;
     let height = window.innerHeight;
-    let camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
+    //let camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
+    let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     sceneElements.camera = camera;
-    camera.position.set(0, 50, 50); //-- camera setting to play the game
-    //camera.position.set(30, 50, 15); // -- camera setting to see the scene from above
-    //camera.lookAt(0, 0, 0);
+    camera.position.set(0, 40, 40);
+    //camera.position.set(0, 20, 15); 
+    camera.up.set(0, 0, 1);
     camera.name = "camera";
     sceneElements.sceneGraph.add(camera);
+
+    
 
     // Illumination
     let ambientLight = new THREE.AmbientLight('rgb(255, 255, 255)', 0.2);
@@ -41,14 +59,13 @@ function initEmptyScene (sceneElements) {
     spotLight.position.set(0, 30, 0);
     sceneElements.sceneGraph.add(spotLight);
 
-    // Setup shadow properties for the spotlight
     spotLight.castShadow = true;
     spotLight.shadow.mapSize.width = 2048;
     spotLight.shadow.mapSize.height = 2048;
 
     spotLight.name = "light";
 
-    // Create renderer (with shadow map)
+    // Renderer
     let renderer = new THREE.WebGLRenderer({ antialias: true });
     sceneElements.renderer = renderer;
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -140,7 +157,8 @@ function onDocumentKeyUp(event) {
     }
 }
 
-
+let mixer;
+let mixer2;
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
@@ -153,7 +171,6 @@ function load3DObjects(sceneGraph) {
     const loader = new GLTFLoader();
 
     // load the player's cat
-
     loader.load( './models/tuxedoCat/scene.gltf', function ( gltf ) {
         gltf.scene.traverse( function ( child ) {
 
@@ -165,7 +182,7 @@ function load3DObjects(sceneGraph) {
 
         } );
         let cat = gltf.scene.children[0];
-        cat.scale.set(0.2, 0.2, 0.2);
+        cat.scale.set(0.25, 0.25, 0.25);
         cat.translateX(20);
         cat.translateY(5);
         cat.translateZ(0);
@@ -173,16 +190,29 @@ function load3DObjects(sceneGraph) {
         cat.name = "cat";
         
         sceneGraph.add( cat );
+
+        cat.add(sceneElements.camera);
+
+
+        if (cat) {
+        mixer = new THREE.AnimationMixer( cat );
+        const clips = gltf.animations;
+        const clip = THREE.AnimationClip.findByName( clips, 'IdleNorm' );
+        const action = mixer.clipAction( clip );
+        action.play();
+
+        mixer2 = new THREE.AnimationMixer( cat );
+        const clips2 = gltf.animations;
+        const clip2 = THREE.AnimationClip.findByName( clips2, 'WalkCycle' );
+        const action2 = mixer2.clipAction( clip2 );
+        action2.play();
+
+        }
         
         //let camera = sceneElements.sceneGraph.getObjectByName("camera");
         //cat.add(camera);
-
-
         //camera look at cat
         //camera.lookAt(cat.position); // descomentar depois
-
-
-        
         //camera.position.set(10, 30, 0);
         /* const cameraOffset = new THREE.Vector3(30, 10, 10); // Adjust as needed
         const cameraRotation = new THREE.Euler(Math.PI / 6, Math.PI, 0); // Adjust as needed
@@ -288,17 +318,25 @@ function load3DObjects(sceneGraph) {
 
         wall.translateX(x).translateY(y).translateZ(z);
         wall.rotateY(rotation);
+        return wall;
+
+        //walls.push(wall);
 
         //wall.material.castShadow = true;
         //wall.material.receiveShadow = true;
     }
 
     // MAZE WALLS 
-    createWall(20, 0, -10, 0);
-    createWall(20, 0, 0, 0);
-    createWall(20, 0, 10, Math.PI/2);
-    createWall(10, 0, -10, Math.PI/2);
-    createWall(10, 0, 10, Math.PI/2);
+    const wall1 = createWall(20, 0, -10, 0);
+    walls.push(wall1);
+    const wall2 = createWall(20, 0, 0, 0);
+    walls.push(wall2);
+    const wall3 = createWall(20, 0, 10, Math.PI/2);
+    walls.push(wall3);
+    const wall4 = createWall(10, 0, -10, Math.PI/2);
+    walls.push(wall4);
+    const wall5 = createWall(10, 0, 10, Math.PI/2);
+    walls.push(wall5);
     createWall(10, 0, 10, 0);
     createWall(10, 0, -10, 0);
     createWall(0, 0, 0, 0);
@@ -326,11 +364,16 @@ function load3DObjects(sceneGraph) {
     
     
     //MAZE OUTLINE on z = 30
-    createWall(0, 0, 30, 0);
-    createWall(10, 0, 30, 0);
-    createWall(20, 0, 30, 0);
-    createWall(-30, 0, 30, 0);
-    createWall(-20, 0, 30, 0);
+    const wall6 = createWall(0, 0, 30, 0);
+    walls.push(wall6);
+    const wall7 = createWall(10, 0, 30, 0);
+    walls.push(wall7);
+    const wall8 = createWall(20, 0, 30, 0);
+    walls.push(wall8);
+    const wall9 = createWall(-30, 0, 30, 0);
+    walls.push(wall9);
+    const wall10 = createWall(-20, 0, 30, 0);
+    walls.push(wall10);
 
     //MAZE OUTLINE on z = -30
     createWall(0, 0, -30, 0);
@@ -356,13 +399,12 @@ function load3DObjects(sceneGraph) {
     createWall(-30, 0, -10, Math.PI/2);
     createWall(-30, 0, -20, Math.PI/2);
 
-    //let camera = sceneElements.sceneGraph.getObjectByName("camera");
-    //cubeObject.add(camera);
+    console.log("walls", walls);
 
-    // cube bounding box
-    /*let cubeBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
-    cubeBB.setFromObject(cubeObject);
-    console.log("cube bounding box", cubeBB); */
+    // show position of all walls
+    for (let i = 0; i < walls.length; i++) {
+        console.log("wall", i, walls[i].position);
+    }
 
     // Let's create the remaining kittens!
     // Gray Cat
@@ -448,53 +490,17 @@ function load3DObjects(sceneGraph) {
     }, undefined, function ( error ) {        
         console.error( error );
     } );
-
-    // create the remaining cubes - SOON TO BE CATS!
-    function createCube (x, y, z) {
-        let cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-        let cubeMaterial = new THREE.MeshPhongMaterial({ color: 'blue' });
-        let cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
-        sceneGraph.add(cubeObject);
-        cubeObject.position.set(x, y, z);
-        cubeObject.castShadow = true;
-        cubeObject.receiveShadow = true;
-        cubeObject.name = "cube";
-    }
-    createCube(-15, 1, 5)
-    createCube(5, 1, 5)
-
-    // create the powerups 
-
-
-    
-    /* // create the tori - SOON TO BE POWERUPS!
-    function createTorus(x, y, z, name) {
-        let torusGeometry = new THREE.TorusGeometry(0.6, 0.2, 16, 100);
-        let torusMaterial = new THREE.MeshPhongMaterial({ color: 'yellow' });
-        let torusObject = new THREE.Mesh(torusGeometry, torusMaterial);
-        sceneGraph.add(torusObject);
-        torusObject.position.set(x, y, z);
-        torusObject.castShadow = true;
-        torusObject.receiveShadow = true;
-        torusObject.name = name;
-        return torusObject;
-    }
-
-    var torus1 = createTorus(-15, 3, -5, "torus1");
-    var torus2 = createTorus(25, 3, 25, "torus2");
- */
 }
 
 // Displacement value
 var delta = 0.1;
 var dispX = 0.2, dispZ = 0.2, dispY = 0.2;
+let clock = new THREE.Clock();
 
 function computeFrame(time) {
 
-    /* let torus1Object = sceneElements.sceneGraph.getObjectByName("torus1");
-    let torus2Object = sceneElements.sceneGraph.getObjectByName("torus2");
-    torus1Object.rotateX(0.03);
-    torus2Object.rotateX(0.03); */
+    let cat = sceneElements.sceneGraph.getObjectByName("cat");
+    if (cat) mixer2.update(clock.getDelta());
 
     // rotate power ups after they load
     let powa1 = sceneElements.sceneGraph.getObjectByName("powa1");
@@ -506,48 +512,105 @@ function computeFrame(time) {
     const xAxis = new THREE.Vector3(1, 0, 0); // Move along the x-axis
     const yAxis = new THREE.Vector3(0, 1, 0); // Move along the z-axis
 
-    let cat = sceneElements.sceneGraph.getObjectByName("cat");
-
-    if (keyD) {
-    cat.translateOnAxis(xAxis, -moveSpeed);
-    //rotate cat to face the right direction
-    //cat.rotation.z = Math.PI/2;
-    }
-    if (keyW) {
+    
+    /* if (keyW) {
     cat.translateOnAxis(yAxis, -moveSpeed);
+    //mixer2.update(clock.getDelta());
     //rotate cat to face the right direction
     //cat.rotation.z = Math.PI;
-    }
-    if (keyA) {
-    cat.translateOnAxis(xAxis, moveSpeed);
-    //rotate cat to face the right direction
-    //cat.rotation.z = -Math.PI/2;
-    }
-    if (keyS) {
-    cat.translateOnAxis(yAxis, moveSpeed);
-    //rotate cat to face the right direction
-    //cat.rotation.z = 0;
-    }
-
-    /* // CONTROLING THE CUBE WITH THE KEYBOARD
-    let cube = sceneElements.sceneGraph.getObjectByName("cube");
-    if (keyD) {
-        cube.translateZ(-dispZ);
-    }
-    if (keyW) {
-         cube.translateX(-dispX);
-    }
-    if (keyA) {
-         cube.translateZ(dispZ);
-    }
-    if (keyS) {
-         cube.translateX(dispX);
     } */
 
+    let rotationSpeed = 0.05;
+
+    if (keyW) {
+        // Calculate the new position of the cat after moving
+        const newPosition = cat.position.clone().addScaledVector(yAxis, -moveSpeed);
+        console.log("newPosition", newPosition);
+    
+        // Check if the new position will intersect with any of the wall objects
+        const intersectingWallIndex = walls.findIndex((wall) => {
+            const wallBoundingBox = new THREE.Box3().setFromObject(wall);
+            console.log("wallBoundingBox", wallBoundingBox);
+            const catBoundingBox = new THREE.Box3().setFromObject(cat);
+            catBoundingBox.translate(newPosition.sub(cat.position));
+            return wallBoundingBox.intersectsBox(catBoundingBox);
+        });
+       
+        if (intersectingWallIndex >= 0) {
+        } else {
+            cat.translateOnAxis(yAxis, -moveSpeed);
+        }
+    }
+
+    /* if (keyW) {
+        // Calculate the new position of the cat after moving
+        const newPosition = cat.position.clone().addScaledVector(xAxis, -moveSpeed);
+    
+        // Check if the new position will intersect with any of the wall objects
+        const intersectingWall = walls.find((wall) => {
+            const wallBoundingBox = new THREE.Box3().setFromObject(wall);
+            const catBoundingBox = new THREE.Box3().setFromObject(cat);
+            catBoundingBox.translate(newPosition.sub(cat.position));
+            return wallBoundingBox.intersectsBox(catBoundingBox);
+        });
+        
+        // If the new position will intersect with a wall, do not move the cat
+        if (intersectingWall) {
+            // Do nothing
+        } else {
+            // If not, move the cat as usual
+            cat.translateOnAxis(yAxis, -moveSpeed);
+        }
+    } */
+
+    /* if (keyW) {
+        const newPosition = cat.position.clone().addScaledVector(yAxis, -moveSpeed);
+        if (newPosition.z < -25) {
+            cat.position.setZ(-25);
+        }
+        else if (newPosition.z > 25) {
+            cat.position.setZ(25);
+        }
+        else if (newPosition.x < -25) {
+            cat.position.setX(-25);
+        } else {
+            cat.translateOnAxis(yAxis, -moveSpeed);
+        }
+    } */
+
+    if (keyA) {
+        cat.rotation.z += rotationSpeed;
+    }
+    
+    if (keyD) {
+        cat.rotation.z -= rotationSpeed;
+    }
+    
+    if (keyS) {
+        cat.translateOnAxis(yAxis, moveSpeed);
+        // no rotation, just backpeddle
+    }
+    
+    /* if (keyA) {
+        cat.translateOnAxis(xAxis, moveSpeed);
+        cat.rotation.z = Math.PI * 2;
+        
+    }
+
+    if (keyD) {
+        cat.translateOnAxis(xAxis, -moveSpeed);
+        cat.rotation.z = Math.PI;
+    }
+
+    if (keyS) {
+        cat.translateOnAxis(yAxis, moveSpeed);
+        // no rotation, just backpeddle
+    }
+ */
     // press space to change the camera point of view to first person
     if (keySpace) {
         let camera = sceneElements.sceneGraph.getObjectByName("camera");
-        camera.position.set(10, 9, 0); // camera setting to play the game
+        camera.position.set(0, 5, 10); // camera setting to play the game
         // press space again to change the camera point of view to third person
         keySpace = false;
         // press tab to change the camera point of view to third person
@@ -555,10 +618,6 @@ function computeFrame(time) {
         let camera = sceneElements.sceneGraph.getObjectByName("camera");
         camera.position.set(30, 50, 15);
     }
-
-    // TO DO:
-    // Check collision with the walls
-    // CheckCollisions_();
 
     // Rendering
     render(sceneElements);
