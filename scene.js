@@ -164,7 +164,7 @@ function load3DObjects(sceneGraph) {
 
     // create background
     let bgloader = new THREE.TextureLoader();
-    let bgTexture = bgloader.load('./textures/bluegrad.PNG');
+    let bgTexture = bgloader.load('./textures/bluegrad.png');
     sceneGraph.background = bgTexture;
 
 
@@ -262,7 +262,7 @@ function load3DObjects(sceneGraph) {
         let powa1 = createPowa(-15, 1, -5, "powa1");
         let powa2 = createPowa(25, 1, 25, "powa2");
     
-    const groundtexture = new THREE.TextureLoader().load('./textures/ground.PNG' );
+    const groundtexture = new THREE.TextureLoader().load('./textures/ground.png' );
     //REAPEAT TEXTURE
     groundtexture.wrapS = THREE.RepeatWrapping;
     groundtexture.wrapT = THREE.RepeatWrapping;
@@ -277,7 +277,7 @@ function load3DObjects(sceneGraph) {
     planeObject.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
     planeObject.receiveShadow = true;
 
-    const grasstexture = new THREE.TextureLoader().load('./textures/grass.PNG' );
+    const grasstexture = new THREE.TextureLoader().load('./textures/grass.png' );
     //REAPEAT TEXTURE
     grasstexture.wrapS = THREE.RepeatWrapping;
     grasstexture.wrapT = THREE.RepeatWrapping;
