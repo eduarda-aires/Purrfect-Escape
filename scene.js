@@ -184,7 +184,7 @@ function load3DObjects(sceneGraph) {
 
         } );
         let cat = gltf.scene.children[0];
-        cat.scale.set(0.25, 0.25, 0.25);
+        cat.scale.set(0.15, 0.15, 0.15);
         cat.translateX(20);
         cat.translateY(5);
         cat.translateZ(0);
@@ -649,15 +649,16 @@ function computeFrame(time) {
         cat.rotation.z -= rotationSpeed;
     }
     
-    if (keyS) {
+    /* if (keyS) {
         cat.translateOnAxis(yAxis, moveSpeed);
         // no rotation, just backpeddle
-    }
+    } */
   
     // press space to change the camera point of view to first person
     if (keySpace) {
         let camera = sceneElements.sceneGraph.getObjectByName("camera");
-        camera.position.set(0, 5, 10); // camera setting to play the game
+        camera.position.set(0, 20, 25); // camera setting to play the game
+        camera.rotateX(-Math.PI/0.101);
         // press space again to change the camera point of view to third person
         keySpace = false;
         // press tab to change the camera point of view to third person
