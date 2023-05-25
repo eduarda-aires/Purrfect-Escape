@@ -9,7 +9,7 @@ document.getElementById("loading-screen").style.visibility = "visible";
 setTimeout(function() {
     // Hide the loading screen
     document.getElementById("loading-screen").style.visibility = "hidden";
-}, 1000);
+}, 2000);
 
 
 let sceneElements = {
@@ -30,8 +30,8 @@ function initEmptyScene (sceneElements) {
     //ceneElements.sceneGraph.rotation.x = Math.PI;
 
     //helper axis helper 
-    let axesHelper = new THREE.AxesHelper( 50 );
-    sceneElements.sceneGraph.add( axesHelper );
+    /* let axesHelper = new THREE.AxesHelper( 50 );
+    sceneElements.sceneGraph.add( axesHelper ); */
 
     // Add camera
     let width = window.innerWidth;
@@ -51,18 +51,18 @@ function initEmptyScene (sceneElements) {
     let ambientLight = new THREE.AmbientLight('rgb(255, 255, 255)', 0.2);
     sceneElements.sceneGraph.add(ambientLight);
 
-    var hemisphericLight = new THREE.HemisphereLight('yellow', 'crimson', 0.1);
+    var hemisphericLight = new THREE.HemisphereLight('yellow', 'crimson', 0.2);
     sceneElements.sceneGraph.add(hemisphericLight);
-
-    let spotLight = new THREE.SpotLight('rgb(255, 255, 255)', 0.8);
+    
+    let spotLight = new THREE.SpotLight('rgb(255, 255, 255)', 1);
     spotLight.position.set(0, 30, 0);
     sceneElements.sceneGraph.add(spotLight);
 
     spotLight.castShadow = true;
     spotLight.shadow.mapSize.width = 2048;
     spotLight.shadow.mapSize.height = 2048;
-
     spotLight.name = "light";
+
 
     // Renderer
     let renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -195,6 +195,18 @@ function load3DObjects(sceneGraph) {
 
         cat.add(sceneElements.camera);
 
+        /* let catLight = new THREE.SpotLight('rgb(255, 255, 255)', 10, 10000, Math.PI / 15);
+        catLight.position.set(0,30, 40);
+        //catLight.lookAt(cat.position);
+        catLight.castShadow = true;
+        catLight.shadow.mapSize.width = 2048;
+        catLight.shadow.mapSize.height = 2048;
+        catLight.name = "catLight";
+        // helper cat lighter 
+        let helper = new THREE.SpotLightHelper(catLight);
+        sceneElements.sceneGraph.add(helper);
+        cat.add(catLight); */
+
 
         if (cat) {
         mixer = new THREE.AnimationMixer( cat );
@@ -210,17 +222,6 @@ function load3DObjects(sceneGraph) {
         /* action2.play(); */
 
         }
-        
-        //let camera = sceneElements.sceneGraph.getObjectByName("camera");
-        //cat.add(camera);
-        //camera look at cat
-        //camera.lookAt(cat.position); // descomentar depois
-        //camera.position.set(10, 30, 0);
-        /* const cameraOffset = new THREE.Vector3(30, 10, 10); // Adjust as needed
-        const cameraRotation = new THREE.Euler(Math.PI / 6, Math.PI, 0); // Adjust as needed
-        camera.position.copy(cameraOffset);
-        camera.rotation.copy(cameraRotation); */
-        
 
     }, undefined, function ( error ) {
     
@@ -271,7 +272,7 @@ function load3DObjects(sceneGraph) {
     groundtexture.wrapS = THREE.RepeatWrapping;
     groundtexture.wrapT = THREE.RepeatWrapping;
     groundtexture.repeat.set( 4, 4 );
-    const groundmaterial = new THREE.MeshPhongMaterial( { map:groundtexture , side: THREE.DoubleSide} );
+    let groundmaterial = new THREE.MeshPhongMaterial( { map:groundtexture , side: THREE.DoubleSide} );
 
     let planeGeometry = new THREE.PlaneGeometry(60, 60);
     let planeMaterial = new THREE.MeshPhongMaterial({ color: 'gray', side: THREE.DoubleSide });
@@ -330,7 +331,7 @@ function load3DObjects(sceneGraph) {
         //wall.material.receiveShadow = true;
     }
 
-    // MAZE WALLS 
+    /* // MAZE WALLS 
     const wall1 = createWall(20, 0, -10, 0);
     walls.push(wall1);
     const wall2 = createWall(20, 0, 0, 0);
@@ -364,20 +365,100 @@ function load3DObjects(sceneGraph) {
     createWall(-10, 0, -20, Math.PI/2);
     createWall(-10, 0, -10, 0);
     createWall(10, 0, -20, 0);
-    createWall(20, 0, 20, 0);
+    createWall(20, 0, 20, 0); */
     
+    const wall1 = createWall(20, 0, -10, 0);
+    walls.push(wall1);
+
+    const wall2 = createWall(20, 0, 0, 0);
+    walls.push(wall2);
+
+    const wall3 = createWall(20, 0, 10, Math.PI/2);
+    walls.push(wall3);
+
+    const wall4 = createWall(10, 0, -10, Math.PI/2);
+    walls.push(wall4);
+
+    const wall5 = createWall(10, 0, 10, Math.PI/2);
+    walls.push(wall5);
+
+    const wall6 = createWall(10, 0, 10, 0);
+    walls.push(wall6);
+
+    const wall7 = createWall(10, 0, -10, 0);
+    walls.push(wall7);
+
+    const wall8 = createWall(0, 0, 0, 0);
+    walls.push(wall8);
+
+    const wall9 = createWall(0, 0, 10, Math.PI/2);
+    walls.push(wall9);
+
+    const wall10 = createWall(0, 0, 20, Math.PI/2);
+    walls.push(wall10);
+
+    const wall11 = createWall(0, 0, 20, 0);
+    walls.push(wall11);
+
+    const wall12 = createWall(-30, 0, 20, 0);
+    walls.push(wall12);
+
+    const wall13 = createWall(-30, 0, 10, 0);
+    walls.push(wall13);
+
+    const wall14 = createWall(-20, 0, 20, 0);
+    walls.push(wall14);
+
+    const wall15 = createWall(-20, 0, 10, 0);
+    walls.push(wall15);
+
+    const wall16 = createWall(-10, 0, 10, Math.PI/2);
+    walls.push(wall16);
+
+    const wall17 = createWall(-20, 0, 0, 0);
+    walls.push(wall17);
+
+    const wall18 = createWall(-20, 0, -10, 0);
+    walls.push(wall18);
+
+    const wall19 = createWall(-20, 0, 0, Math.PI/2);
+    walls.push(wall19);
+
+    const wall20 = createWall(-10, 0, 30, 0);
+    walls.push(wall20);
+
+    const wall21 = createWall(-20, 0 ,-10, Math.PI/2);
+    walls.push(wall21);
+
+    const wall22 = createWall(-20, 0, 10, 0);
+    walls.push(wall22);
+
+    const wall23 = createWall(-10, 0, -20, 0);
+    walls.push(wall23);
+
+    const wall24 = createWall(-10, 0, -20, Math.PI/2);
+    walls.push(wall24);
+
+    const wall25 = createWall(-10, 0, -10, 0);
+    walls.push(wall25);
+
+    const wall26 = createWall(10, 0, -20, 0);
+    walls.push(wall26);
+
+    const wall27 = createWall(20, 0, 20, 0);
+    walls.push(wall27);
     
     //MAZE OUTLINE on z = 30
-    const wall6 = createWall(0, 0, 30, 0);
-    walls.push(wall6);
-    const wall7 = createWall(10, 0, 30, 0);
-    walls.push(wall7);
-    const wall8 = createWall(20, 0, 30, 0);
-    walls.push(wall8);
-    const wall9 = createWall(-30, 0, 30, 0);
-    walls.push(wall9);
-    const wall10 = createWall(-20, 0, 30, 0);
-    walls.push(wall10);
+    const wall28 = createWall(0, 0, 30, 0);
+    walls.push(wall28);
+    const wall29 = createWall(10, 0, 30, 0);
+    walls.push(wall29);
+    const wall30 = createWall(20, 0, 30, 0);
+    walls.push(wall30);
+    const wall31 = createWall(-30, 0, 30, 0);
+    walls.push(wall31);
+    const wall32 = createWall(-20, 0, 30, 0);
+    walls.push(wall32);
 
     //MAZE OUTLINE on z = -30
     createWall(0, 0, -30, 0);
@@ -512,6 +593,8 @@ let broCatFound = false;
 let whiteCatFound = false;
 let allCatsFound = false;
 
+cat.previousPosition = cat.position.clone();
+
 function computeFrame(time) {
 
     let cat = sceneElements.sceneGraph.getObjectByName("cat");
@@ -547,25 +630,34 @@ function computeFrame(time) {
         const distanceThreshold = 3; 
         console.log("Cat currently at:", newPosition);
 
-        if (newPosition.z < -25) {
-            cat.position.setZ(-25);
+        const direction = yAxis.clone().negate();
+        const raycaster = new THREE.Raycaster(cat.position, direction);
+        const intersects = raycaster.intersectObjects(walls, true);
+        if (intersects.length > 0) {
+            // Cat is colliding with a wall, prevent movement
+        cat.position.copy(cat.position);
         }
-        else if (newPosition.z > 25) {
-            cat.position.setZ(25);
+        else if (newPosition.z < -27) {
+            cat.position.setZ(-27);
         }
-        else if (newPosition.x < -25) {
-            cat.position.setX(-25);
+        else if (newPosition.z > 27) {
+            cat.position.setZ(27);
+        }
+        else if (newPosition.x < -27) {
+            cat.position.setX(-27);
         }
         else if (newPosition.distanceTo(powerUpPosition1) <= distanceThreshold) {
         const powerUp1 = sceneElements.sceneGraph.getObjectByName("powa1");
             if (powerUp1) {
             sceneElements.sceneGraph.remove(powerUp1);
+            cat.scale.set(0.08, 0.08, 0.08);    // smol cat
             }
         }
         else if (newPosition.distanceTo(powerUpPosition2) <= distanceThreshold) {
         const powerUp2 = sceneElements.sceneGraph.getObjectByName("powa2");
             if (powerUp2) {
                 sceneElements.sceneGraph.remove(powerUp2);
+                cat.scale.set(0.15, 0.15, 0.15)   //big cat
             }
         } else if (newPosition.distanceTo(oraCatPosition) <= distanceThreshold) {
             const oraCat = sceneElements.sceneGraph.getObjectByName("oraCat");
