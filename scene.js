@@ -5,10 +5,19 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Show the loading screen
 document.getElementById("loading-screen").style.visibility = "visible";
+document.getElementById("pawprintw").style.visibility = "hidden";
+document.getElementById("pawprintb").style.visibility = "hidden";
+document.getElementById("pawprintg").style.visibility = "hidden";
+document.getElementById("pawprinto").style.visibility = "hidden";
 
 setTimeout(function() {
     // Hide the loading screen
     document.getElementById("loading-screen").style.visibility = "hidden";
+    document.getElementById("pawprintw").style.visibility = "visible";
+    document.getElementById("pawprintb").style.visibility = "visible";
+    document.getElementById("pawprintg").style.visibility = "visible";
+    document.getElementById("pawprinto").style.visibility = "visible";
+
 }, 2000);
 
 
@@ -664,24 +673,33 @@ function computeFrame(time) {
             if (oraCat) {
                 sceneElements.sceneGraph.remove(oraCat);
                 oraCatFound = true;
+                // one pawprint disappears
+                let pawprinto = document.getElementById("pawprinto");
+                pawprinto.style.display = "none";
             }
         } else if (newPosition.distanceTo(grayCatPosition) <= distanceThreshold) {
             const grayCat = sceneElements.sceneGraph.getObjectByName("grayCat");
             if (grayCat) {
                 sceneElements.sceneGraph.remove(grayCat);
                 grayCatFound = true;
+                let pawprintg = document.getElementById("pawprintg");
+                pawprintg.style.display = "none";
             }
         } else if (newPosition.distanceTo(broCatPosition) <= distanceThreshold) {
             const broCat = sceneElements.sceneGraph.getObjectByName("broCat");
             if (broCat) {
                 sceneElements.sceneGraph.remove(broCat);
                 broCatFound = true;
+                let pawprintb = document.getElementById("pawprintb");
+                pawprintb.style.display = "none";
             }       
         } else if (newPosition.distanceTo(whiteCatPosition) <= distanceThreshold) {
             const whiteCat = sceneElements.sceneGraph.getObjectByName("whiteCat");
             if (whiteCat) {
                 sceneElements.sceneGraph.remove(whiteCat);
                 whiteCatFound = true;
+                let pawprintw = document.getElementById("pawprintw");
+                pawprintw.style.display = "none";
             }
         } else if (newPosition.x > 25) {
             cat.position.setX(25);
