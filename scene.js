@@ -1,9 +1,8 @@
-// model importer
 import * as THREE from 'three'; 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-// Show the loading screen
+
 document.getElementById("loading-screen").style.visibility = "visible";
 document.getElementById("pawprintw").style.visibility = "hidden";
 document.getElementById("pawprintb").style.visibility = "hidden";
@@ -11,7 +10,6 @@ document.getElementById("pawprintg").style.visibility = "hidden";
 document.getElementById("pawprinto").style.visibility = "hidden";
 
 setTimeout(function() {
-    // Hide the loading screen
     document.getElementById("loading-screen").style.visibility = "hidden";
     document.getElementById("pawprintw").style.visibility = "visible";
     document.getElementById("pawprintb").style.visibility = "visible";
@@ -36,27 +34,22 @@ function initEmptyScene (sceneElements) {
     // Create the 3D scene
     sceneElements.sceneGraph = new THREE.Scene();
 
-    //ceneElements.sceneGraph.rotation.x = Math.PI;
-
-    //helper axis helper 
     /* let axesHelper = new THREE.AxesHelper( 50 );
     sceneElements.sceneGraph.add( axesHelper ); */
 
-    // Add camera
     let width = window.innerWidth;
     let height = window.innerHeight;
     //let camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
     let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     sceneElements.camera = camera;
     camera.position.set(0, 40, 40);
+    //camera.position.set(0, 20, 25);
     //camera.position.set(0, 20, 15); 
     camera.up.set(0, 0, 1);
     camera.name = "camera";
     sceneElements.sceneGraph.add(camera);
 
-    
 
-    // Illumination
     let ambientLight = new THREE.AmbientLight('rgb(255, 255, 255)', 0.2);
     sceneElements.sceneGraph.add(ambientLight);
 
@@ -73,7 +66,6 @@ function initEmptyScene (sceneElements) {
     spotLight.name = "light";
 
 
-    // Renderer
     let renderer = new THREE.WebGLRenderer({ antialias: true });
     sceneElements.renderer = renderer;
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -87,7 +79,9 @@ function initEmptyScene (sceneElements) {
     
     //sceneElements.control = new THREE.OrbitControls(camera);
     const control = new OrbitControls( camera, renderer.domElement );
-    control.screenSpacePanning = true;
+    control.enablePan = false;
+    control.enableRotate = false;
+    
 
     // Add the rendered image in the HTML DOM
     let htmlElement = document.querySelector("#Tag3DScene");
@@ -203,19 +197,9 @@ function load3DObjects(sceneGraph) {
         sceneGraph.add( cat );
 
         cat.add(sceneElements.camera);
-
-        /* let catLight = new THREE.SpotLight('rgb(255, 255, 255)', 10, 10000, Math.PI / 15);
-        catLight.position.set(0,30, 40);
-        //catLight.lookAt(cat.position);
-        catLight.castShadow = true;
-        catLight.shadow.mapSize.width = 2048;
-        catLight.shadow.mapSize.height = 2048;
-        catLight.name = "catLight";
-        // helper cat lighter 
-        let helper = new THREE.SpotLightHelper(catLight);
-        sceneElements.sceneGraph.add(helper);
-        cat.add(catLight); */
-
+        let camera = sceneElements.sceneGraph.getObjectByName("camera");
+        camera.position.set(0, 20, 25); // camera setting to play the game
+        camera.rotateX(-Math.PI/0.101);
 
         if (cat) {
         mixer = new THREE.AnimationMixer( cat );
@@ -223,13 +207,9 @@ function load3DObjects(sceneGraph) {
         const clip = THREE.AnimationClip.findByName( clips, 'IdleNorm' );
         action = mixer.clipAction( clip );
         action.play();
-/* 
-        mixer2 = new THREE.AnimationMixer( cat );
-        const clips2 = gltf.animations; */
+
         const clip2 = THREE.AnimationClip.findByName( clips, 'WalkCycle' );
         action2 = mixer.clipAction( clip2 );
-        /* action2.play(); */
-
         }
 
     }, undefined, function ( error ) {
@@ -238,7 +218,6 @@ function load3DObjects(sceneGraph) {
     
     } );
 
-    // load powerups
 
     function createPowa(x, y, z, name) {
 
@@ -248,9 +227,7 @@ function load3DObjects(sceneGraph) {
             gltf.scene.traverse( function ( child ) {
 
                 if ( child.isMesh ) {
-                    // Set shadow property
                     child.castShadow = true;
-                    //child.receiveShadow = true;
                 }
 
             } );
@@ -264,9 +241,7 @@ function load3DObjects(sceneGraph) {
             powa.name = name;
             return powa;
         }, undefined, function ( error ) {
-        
             console.error( error );
-        
         }
         );
     }
@@ -277,7 +252,6 @@ function load3DObjects(sceneGraph) {
         powerups.push(powa2);
     
     const groundtexture = new THREE.TextureLoader().load('./textures/stonyground.png' );
-    //REAPEAT TEXTURE
     groundtexture.wrapS = THREE.RepeatWrapping;
     groundtexture.wrapT = THREE.RepeatWrapping;
     groundtexture.repeat.set( 4, 4 );
@@ -292,7 +266,6 @@ function load3DObjects(sceneGraph) {
     planeObject.receiveShadow = true;
 
     const grasstexture = new THREE.TextureLoader().load('./textures/grassy.png' );
-    //REAPEAT TEXTURE
     grasstexture.wrapS = THREE.RepeatWrapping;
     grasstexture.wrapT = THREE.RepeatWrapping;
     grasstexture.repeat.set( 0.06, 0.06 );
@@ -301,7 +274,6 @@ function load3DObjects(sceneGraph) {
     grassmaterial.polygonOffsetFactor = -0.1;
     grassmaterial.polygonOffsetUnits = -1;
 
-    // WALLS
     let length = 10, width = 5;
 
     let wall = new THREE.Shape();
@@ -328,53 +300,12 @@ function load3DObjects(sceneGraph) {
         let wall = new THREE.Mesh( wall_geometry, grassmaterial ) ;
         sceneGraph.add( wall );
         wall.castShadow = true;
-        //wall.receiveShadow = true;
 
         wall.translateX(x).translateY(y).translateZ(z);
         wall.rotateY(rotation);
         return wall;
-
-        //walls.push(wall);
-
-        //wall.material.castShadow = true;
         //wall.material.receiveShadow = true;
     }
-
-    /* // MAZE WALLS 
-    const wall1 = createWall(20, 0, -10, 0);
-    walls.push(wall1);
-    const wall2 = createWall(20, 0, 0, 0);
-    walls.push(wall2);
-    const wall3 = createWall(20, 0, 10, Math.PI/2);
-    walls.push(wall3);
-    const wall4 = createWall(10, 0, -10, Math.PI/2);
-    walls.push(wall4);
-    const wall5 = createWall(10, 0, 10, Math.PI/2);
-    walls.push(wall5);
-    createWall(10, 0, 10, 0);
-    createWall(10, 0, -10, 0);
-    createWall(0, 0, 0, 0);
-    createWall(0, 0, 10, Math.PI/2);
-    createWall(0, 0, 20, Math.PI/2);
-    createWall(0, 0, 20, 0);
-
-    createWall(-30, 0, 20, 0);
-    createWall(-30, 0, 10, 0);
-    createWall(-20, 0, 20, 0);
-    createWall(-20, 0, 10, 0);
-    createWall(-10, 0, 10, Math.PI/2);
-    createWall(-20, 0, 0, 0);
-    createWall(-20, 0, -10, 0);
-    
-    createWall(-20, 0, 0, Math.PI/2);
-    createWall(-10, 0, 30, 0);
-    createWall(-20, 0 ,-10, Math.PI/2);
-    createWall(-20, 0, 10, 0);
-    createWall(-10, 0, -20, 0);
-    createWall(-10, 0, -20, Math.PI/2);
-    createWall(-10, 0, -10, 0);
-    createWall(10, 0, -20, 0);
-    createWall(20, 0, 20, 0); */
     
     const wall1 = createWall(20, 0, -10, 0);
     walls.push(wall1);
@@ -495,18 +426,12 @@ function load3DObjects(sceneGraph) {
 
     console.log("walls", walls);
 
-    // show position of all walls
-    for (let i = 0; i < walls.length; i++) {
-        console.log("wall", i, walls[i].position);
-    }
-
     // Let's create the remaining kittens!
     // OrangeCat
     loader.load( './models/orangeCat/scene.gltf', function ( gltf ) {
         gltf.scene.traverse( function ( child ) {
 
             if ( child.isMesh ) {
-                // Set shadow property
                 child.castShadow = true;
                 child.receiveShadow = true;
             }
@@ -527,7 +452,6 @@ function load3DObjects(sceneGraph) {
         gltf.scene.traverse( function ( child ) {
 
             if ( child.isMesh ) {
-                // Set shadow property
                 child.castShadow = true;
                 child.receiveShadow = true;
             }
@@ -548,7 +472,6 @@ function load3DObjects(sceneGraph) {
         gltf.scene.traverse( function ( child ) {
 
             if ( child.isMesh ) {
-                // Set shadow property
                 child.castShadow = true;
                 child.receiveShadow = true;
             }
@@ -569,7 +492,6 @@ function load3DObjects(sceneGraph) {
         gltf.scene.traverse( function ( child ) {
 
             if ( child.isMesh ) {
-                // Set shadow property
                 child.castShadow = true;
                 child.receiveShadow = true;
             }
@@ -586,11 +508,6 @@ function load3DObjects(sceneGraph) {
     } );
 }
 
-function removePowerUp(powerUp) {
-    sceneElements.sceneGraph.remove(powerUp);
-  }
-
-// Displacement value
 var delta = 0.1;
 var dispX = 0.2, dispZ = 0.2, dispY = 0.2;
 let clock = new THREE.Clock();
@@ -601,8 +518,6 @@ let grayCatFound = false;
 let broCatFound = false;
 let whiteCatFound = false;
 let allCatsFound = false;
-
-cat.previousPosition = cat.position.clone();
 
 function computeFrame(time) {
 
@@ -621,14 +536,12 @@ function computeFrame(time) {
     let rotationSpeed = 0.05;
 
     if (keyW) {
-        // Calculate the new position of the cat after moving
+
         const newPosition = cat.position.clone().addScaledVector(yAxis, -moveSpeed);
         
-        // powerup positions
         const powerUpPosition1 = new THREE.Vector3(-15, 1, -5);
         const powerUpPosition2 = new THREE.Vector3(25, 1, 25);
 
-        // kitten positions
         const oraCatPosition = new THREE.Vector3(15, 0.5, -15);
         const grayCatPosition = new THREE.Vector3(-25, 0, 25);
         const broCatPosition = new THREE.Vector3(-15, -0.5, 5);
@@ -642,8 +555,8 @@ function computeFrame(time) {
         const direction = yAxis.clone().negate();
         const raycaster = new THREE.Raycaster(cat.position, direction);
         const intersects = raycaster.intersectObjects(walls, true);
+
         if (intersects.length > 0) {
-            // Cat is colliding with a wall, prevent movement
         cat.position.copy(cat.position);
         }
         else if (newPosition.z < -27) {
@@ -654,6 +567,9 @@ function computeFrame(time) {
         }
         else if (newPosition.x < -27) {
             cat.position.setX(-27);
+        }
+        else if (newPosition.x > 27) {
+            cat.position.setX(27);
         }
         else if (newPosition.distanceTo(powerUpPosition1) <= distanceThreshold) {
         const powerUp1 = sceneElements.sceneGraph.getObjectByName("powa1");
@@ -701,8 +617,7 @@ function computeFrame(time) {
                 let pawprintw = document.getElementById("pawprintw");
                 pawprintw.style.display = "none";
             }
-        } else if (newPosition.x > 25) {
-            cat.position.setX(25);
+        
         } else {
             cat.translateOnAxis(yAxis, -moveSpeed);
         }
@@ -710,7 +625,6 @@ function computeFrame(time) {
         if (oraCatFound && grayCatFound && broCatFound && whiteCatFound) {
             allCatsFound = true;
             console.log("All cats have been found! Search for the exit!");
-            // Display the message
             const messageContainer = document.getElementById("message-container");
             messageContainer.style.display = "block";
         }
@@ -723,11 +637,8 @@ function computeFrame(time) {
             messageContainer.style.display = "none";
         }
 
-    
-        // Check if the new position will intersect with any of the wall objects
         const intersectingWallIndex = walls.findIndex((wall) => {
             const wallBoundingBox = new THREE.Box3().setFromObject(wall);
-            //console.log("wallBoundingBox", wallBoundingBox);
             const catBoundingBox = new THREE.Box3().setFromObject(cat);
             catBoundingBox.translate(newPosition.sub(cat.position));
             return wallBoundingBox.intersectsBox(catBoundingBox);
@@ -737,8 +648,7 @@ function computeFrame(time) {
         } else {
             cat.translateOnAxis(yAxis, -moveSpeed);
         }
-
-        // Aniamtion 
+ 
         if (cat) {
             action.stop();
             action2.play();
@@ -758,30 +668,11 @@ function computeFrame(time) {
     if (keyD) {
         cat.rotation.z -= rotationSpeed;
     }
-    
-    /* if (keyS) {
-        cat.translateOnAxis(yAxis, moveSpeed);
-        // no rotation, just backpeddle
-    } */
-  
-    // press space to change the camera point of view to first person
-    if (keySpace) {
-        let camera = sceneElements.sceneGraph.getObjectByName("camera");
-        camera.position.set(0, 20, 25); // camera setting to play the game
-        camera.rotateX(-Math.PI/0.101);
-        // press space again to change the camera point of view to third person
-        keySpace = false;
-        // press tab to change the camera point of view to third person
-    } else if (keyT) {
-        let camera = sceneElements.sceneGraph.getObjectByName("camera");
-        camera.position.set(30, 50, 15);
-    }
 
     if (cat) mixer.update(clock.getDelta());
 
     // Rendering
     render(sceneElements);
-
     // Call for the next frame
     requestAnimationFrame(computeFrame);
 }
