@@ -31,7 +31,6 @@ let powerups = [];
 
 function initEmptyScene (sceneElements) {
 
-    // Create the 3D scene
     sceneElements.sceneGraph = new THREE.Scene();
 
     /* let axesHelper = new THREE.AxesHelper( 50 );
@@ -39,12 +38,9 @@ function initEmptyScene (sceneElements) {
 
     let width = window.innerWidth;
     let height = window.innerHeight;
-    //let camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
     let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     sceneElements.camera = camera;
     camera.position.set(0, 40, 40);
-    //camera.position.set(0, 20, 25);
-    //camera.position.set(0, 20, 15); 
     camera.up.set(0, 0, 1);
     camera.name = "camera";
     sceneElements.sceneGraph.add(camera);
@@ -75,15 +71,12 @@ function initEmptyScene (sceneElements) {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    //Camera control
-    
-    //sceneElements.control = new THREE.OrbitControls(camera);
+    //Orbit Controls
     const control = new OrbitControls( camera, renderer.domElement );
     control.enablePan = false;
     control.enableRotate = false;
-    
-
-    // Add the rendered image in the HTML DOM
+    control.enableZoom = false;
+ 
     let htmlElement = document.querySelector("#Tag3DScene");
     htmlElement.appendChild(renderer.domElement);
 };
@@ -98,8 +91,6 @@ window.addEventListener('resize', resizeWindow);
 requestAnimationFrame(computeFrame);
 
 // Event Listeners
-
-
 let keyD = false, keyA = false, keyS = false, keyW = false, keySpace = false, keyT = false;
 document.addEventListener('keydown', onDocumentKeyDown, false);
 document.addEventListener('keyup', onDocumentKeyUp, false);
@@ -161,26 +152,22 @@ function onDocumentKeyUp(event) {
 
 let mixer;
 let action;
-let mixer2;
 let action2;
-let currentAction = "idle";
+
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
-    // create background
     let bgloader = new THREE.TextureLoader();
     let bgTexture = bgloader.load('./textures/bluegrad.png');
     sceneGraph.background = bgTexture;
 
 
     const loader = new GLTFLoader();
-
     // load the player's cat
     loader.load( './models/tuxedoCat/scene.gltf', function ( gltf ) {
         gltf.scene.traverse( function ( child ) {
 
             if ( child.isMesh ) {
-                // Set shadow property
                 child.castShadow = true;
                 child.receiveShadow = true;
             }
@@ -198,7 +185,7 @@ function load3DObjects(sceneGraph) {
 
         cat.add(sceneElements.camera);
         let camera = sceneElements.sceneGraph.getObjectByName("camera");
-        camera.position.set(0, 20, 25); // camera setting to play the game
+        camera.position.set(0, 20, 25);     // camera setting to play the game
         camera.rotateX(-Math.PI/0.101);
 
         if (cat) {
