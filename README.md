@@ -17,6 +17,6 @@ HTML & CSS: Structure and styling for the game interface.
 WebGL/Canvas: 3D rendering of the labyrinth and game objects.
 
 ## 📂 How to Play
-Start the Game: Play Purrfect Escape
+Start the Game: [Play Purrfect Escape!](https://raw.githack.com/eduarda-aires/Purrfect-Escape/refs/heads/main/index.html)
 Controls: Use the arrow keys to move the cat through the labyrinth.
 Objective: Find and save all the other cats, then escape the labyrinth through the exit!
